@@ -1,4 +1,4 @@
-from proxy_learner.karing import (
+from directlane.karing import (
     extract_host,
     is_learned_direct_connection,
     is_proxied_connection,

@@ -1,4 +1,4 @@
-from proxy_learner.state import ProbeState
+from directlane.state import ProbeState
 
 
 def test_mark_probed_records_host(tmp_path):

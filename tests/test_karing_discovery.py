@@ -1,6 +1,6 @@
 import json
 
-from proxy_learner.karing_discovery import discover_karing
+from directlane.karing_discovery import discover_karing
 
 
 def test_discover_karing_reads_control_port_and_secret(tmp_path):

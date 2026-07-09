@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "proxy-learner"
+name = "directlane"
 version = "0.2.0"
 description = "Karing sidecar that learns which domains work via direct connection"
 readme = "README.md"
@@ -19,7 +19,7 @@ dev = [
 ]
 
 [project.scripts]
-proxy-learner = "proxy_learner.__main__:main"
+directlane = "directlane.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

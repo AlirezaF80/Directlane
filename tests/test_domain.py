@@ -1,4 +1,4 @@
-from proxy_learner.domain import to_rule_target
+from directlane.domain import to_rule_target
 
 
 def test_to_rule_target_uses_exact_hostname():

@@ -1,4 +1,4 @@
-from proxy_learner.logs import find_failed_host
+from directlane.logs import find_failed_host
 
 
 def test_find_failed_host_matches_learned_target():

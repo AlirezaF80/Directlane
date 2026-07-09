@@ -4,7 +4,7 @@ from typing import Any
 
 import requests
 
-from proxy_learner.domain import normalize_host
+from directlane.domain import normalize_host
 
 
 class KaringClient:

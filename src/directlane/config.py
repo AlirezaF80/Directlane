@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 
-from proxy_learner.karing_discovery import discover_karing
+from directlane.karing_discovery import discover_karing
 
 
 @dataclass(frozen=True)

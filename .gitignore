@@ -5,6 +5,7 @@ __pycache__/
 dist/
 build/
 state.json
+learned-direct.json
 .venv/
 venv/
 learner-out.txt

@@ -4,10 +4,10 @@ import logging
 import time
 from threading import Event, Thread
 
-from proxy_learner.config import Config
-from proxy_learner.karing import KaringClient
-from proxy_learner.learner import Learner
-from proxy_learner.logs import find_failed_host
+from directlane.config import Config
+from directlane.karing import KaringClient
+from directlane.learner import Learner
+from directlane.logs import find_failed_host
 
 logger = logging.getLogger(__name__)
 

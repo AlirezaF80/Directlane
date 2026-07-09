@@ -3,10 +3,10 @@ from __future__ import annotations
 from collections.abc import Callable
 from pathlib import Path
 
-from proxy_learner.domain import to_rule_target
-from proxy_learner.probe import confirm_outcome
-from proxy_learner.rules import KaringRuleStore
-from proxy_learner.state import ProbeState
+from directlane.domain import to_rule_target
+from directlane.probe import confirm_outcome
+from directlane.rules import KaringRuleStore
+from directlane.state import ProbeState
 
 
 class Learner:
@@ -78,7 +78,7 @@ class Learner:
                 if len(self._seen_connection_ids) > 10_000:
                     self._seen_connection_ids.clear()
 
-            from proxy_learner.karing import (
+            from directlane.karing import (
                 extract_host,
                 is_proxied_connection,
             )
@@ -119,6 +119,6 @@ class Learner:
 
 
 def probe_tls_with_timeout(host: str, timeout: float) -> bool:
-    from proxy_learner.probe import probe_tls
+    from directlane.probe import probe_tls
 
     return probe_tls(host, timeout=timeout)

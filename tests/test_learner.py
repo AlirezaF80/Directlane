@@ -1,4 +1,4 @@
-from proxy_learner.learner import Learner
+from directlane.learner import Learner
 
 
 def test_promote_domain_on_first_sighting(tmp_path):

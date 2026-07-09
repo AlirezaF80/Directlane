@@ -1,4 +1,4 @@
-# Proxy Learner
+# Directlane
 
 Python sidecar for [Karing](https://karing.app) that learns which domains are reachable via **direct** connection in Iran, and maintains a Karing diversion JSON file so those domains can skip VPN.
 
@@ -10,7 +10,7 @@ Python sidecar for [Karing](https://karing.app) that learns which domains are re
    - Windows system proxy: point at Karing
    - **Control and Sync** port `3057` is the external controller API (Settings → Port)
 
-   `proxy-learner` auto-discovers API URL and secret from:
+   `directlane` auto-discovers API URL and secret from:
 
    `%APPDATA%\karing\karing\service.json`
 
@@ -20,10 +20,10 @@ Python sidecar for [Karing](https://karing.app) that learns which domains are re
    pip install -e ".[dev]"
    ```
 
-3. **Run the learner**
+3. **Run Directlane**
 
    ```bash
-   proxy-learner
+   directlane
    ```
 
 4. **Import rules into Karing**
@@ -41,7 +41,7 @@ Python sidecar for [Karing](https://karing.app) that learns which domains are re
 | Promote | Adds exact hostname to `learned-direct.json` `domain` list |
 | Revoke | Watches warning logs; on DIRECT failure → re-probe 2/3 fail → remove host |
 
-Unknown domains keep Karing's default **PROXY** behavior. The learner only grows the DIRECT list.
+Unknown domains keep Karing's default **PROXY** behavior. Directlane only grows the DIRECT list.
 
 ## Configuration
 

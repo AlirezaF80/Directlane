@@ -1,6 +1,6 @@
 import json
 
-from proxy_learner.rules import KaringRuleStore
+from directlane.rules import KaringRuleStore
 
 
 def test_empty_store_has_no_rules(tmp_path):
