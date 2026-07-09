@@ -1,0 +1,16 @@
+# Add these snippets to your Karing Clash-compatible config.
+
+external-controller: 127.0.0.1:9093
+# secret: "your-secret"  # optional; set KARING_SECRET to match
+
+rule-providers:
+  learned-direct:
+    type: file
+    behavior: classical
+    path: ./learned-direct.yaml
+    interval: 86400
+
+rules:
+  - RULE-SET,learned-direct,DIRECT
+  # ... your existing rules ...
+  - MATCH,PROXY
