@@ -7,3 +7,5 @@ build/
 state.json
 .venv/
 venv/
+learner-out.txt
+learner-err.txt

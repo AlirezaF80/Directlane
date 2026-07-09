@@ -4,6 +4,8 @@ import logging
 import time
 from threading import Event, Thread
 
+import requests
+
 from proxy_learner.config import Config
 from proxy_learner.karing import KaringClient
 from proxy_learner.learner import Learner
@@ -14,7 +16,10 @@ logger = logging.getLogger(__name__)
 
 def build_learner(config: Config, client: KaringClient) -> Learner:
     def reload_provider() -> None:
-        client.reload_rule_provider(config.rule_provider_name)
+        try:
+            client.reload_rule_provider(config.rule_provider_name)
+        except requests.RequestException as exc:
+            logger.warning("failed to reload rule provider: %s", exc)
 
     return Learner(
         rules_path=config.rules_path,
@@ -28,7 +33,11 @@ def build_learner(config: Config, client: KaringClient) -> Learner:
 
 
 def poll_connections(learner: Learner, client: KaringClient) -> None:
-    connections = client.get_connections()
+    try:
+        connections = client.get_connections()
+    except Exception as exc:
+        logger.warning("connection poll failed, retrying: %s", exc)
+        return
     learner.process_connections(connections)
 
 
@@ -57,6 +66,11 @@ def watch_logs(
 
 def run(config: Config | None = None) -> None:
     config = config or Config.from_env()
+    logger.info("Karing API: %s", config.karing_api_url)
+    logger.info(
+        "Auth: %s",
+        "secret configured" if config.karing_secret else "no secret",
+    )
     client = KaringClient(config.karing_api_url, config.karing_secret)
     learner = build_learner(config, client)
     stop_event = Event()

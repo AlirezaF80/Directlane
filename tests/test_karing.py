@@ -52,11 +52,12 @@ def test_get_connections_parses_payload(mocker):
 def test_reload_rule_provider_calls_put(mocker):
     session = mocker.Mock()
     response = mocker.Mock()
+    response.status_code = 204
     response.raise_for_status = mocker.Mock()
     session.put.return_value = response
 
     client = KaringClient("http://127.0.0.1:9093", session=session)
-    client.reload_rule_provider("learned-direct")
+    assert client.reload_rule_provider("learned-direct") is True
 
     session.put.assert_called_once_with(
         "http://127.0.0.1:9093/providers/rules/learned-direct",

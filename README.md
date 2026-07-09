@@ -5,11 +5,19 @@ Python sidecar for [Karing](https://karing.app) that learns which domains are re
 ## Phase 1 setup
 
 1. **Karing**
-   - TUN mode: off
-   - Mixed port: `3067` (or your usual port)
+   - TUN mode: off (phase 1)
+   - Mixed port: `3067` (Settings → Port → Rule Based)
    - Windows system proxy: point at Karing
-   - Merge `config/karing-snippet.yaml` into your Karing config
-   - Enable external controller on `127.0.0.1:9093`
+   - Merge `config/karing-snippet.yaml` into your Karing routing rules
+   - **Control and Sync** port `3057` is the external controller API (Settings → Port)
+
+   `proxy-learner` auto-discovers API URL and secret from:
+
+   `%APPDATA%\karing\karing\service.json`
+
+   **Important:** Add the `learned-direct` rule-provider to Karing routing rules
+   (see `config/karing-snippet.yaml`). Until then, rules are written to
+   `learned-direct.yaml` but Karing won't apply them.
 
 2. **Install**
 
@@ -26,7 +34,7 @@ Python sidecar for [Karing](https://karing.app) that learns which domains are re
    Or with env overrides:
 
    ```bash
-   set KARING_API_URL=http://127.0.0.1:9093
+   set KARING_API_URL=http://127.0.0.1:3057
    set RULES_PATH=learned-direct.yaml
    set SIGHTING_THRESHOLD=3
    proxy-learner
@@ -48,8 +56,8 @@ Unknown domains keep Karing's default **PROXY** behavior. The learner only grows
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `KARING_API_URL` | `http://127.0.0.1:9093` | Clash external controller |
-| `KARING_SECRET` | — | Bearer token if configured |
+| `KARING_API_URL` | `http://127.0.0.1:3057` (auto from `service.json`) | Clash external controller |
+| `KARING_SECRET` | auto from `service.json` | Bearer token |
 | `RULES_PATH` | `learned-direct.yaml` | Rule-provider file path |
 | `STATE_PATH` | `state.json` | Sighting counts |
 | `RULE_PROVIDER_NAME` | `learned-direct` | Provider name in Karing config |

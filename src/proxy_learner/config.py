@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 
+from proxy_learner.karing_discovery import discover_karing
+
 
 @dataclass(frozen=True)
 class Config:
@@ -19,11 +21,15 @@ class Config:
 
     @classmethod
     def from_env(cls) -> Config:
+        discovered = discover_karing()
+        default_api_url = discovered.api_url if discovered else "http://127.0.0.1:3057"
+        default_secret = discovered.secret if discovered else None
+
         return cls(
             karing_api_url=os.environ.get(
-                "KARING_API_URL", "http://127.0.0.1:9093"
+                "KARING_API_URL", default_api_url
             ).rstrip("/"),
-            karing_secret=os.environ.get("KARING_SECRET") or None,
+            karing_secret=os.environ.get("KARING_SECRET", default_secret) or None,
             rules_path=os.environ.get("RULES_PATH", "learned-direct.yaml"),
             state_path=os.environ.get("STATE_PATH", "state.json"),
             rule_provider_name=os.environ.get(

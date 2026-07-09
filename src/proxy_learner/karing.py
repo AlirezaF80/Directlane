@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import requests
 
 from proxy_learner.domain import normalize_host
+
+logger = logging.getLogger(__name__)
 
 
 class KaringClient:
@@ -28,12 +31,20 @@ class KaringClient:
         payload = response.json()
         return list(payload.get("connections", []))
 
-    def reload_rule_provider(self, provider_name: str) -> None:
+    def reload_rule_provider(self, provider_name: str) -> bool:
         response = self._session.put(
             f"{self._base_url}/providers/rules/{provider_name}",
             timeout=10,
         )
+        if response.status_code == 404:
+            logger.warning(
+                "rule provider %r not found in Karing — add it via "
+                "config/karing-snippet.yaml and reconnect",
+                provider_name,
+            )
+            return False
         response.raise_for_status()
+        return True
 
     def iter_log_lines(self, level: str = "warning") -> requests.Response:
         return self._session.get(

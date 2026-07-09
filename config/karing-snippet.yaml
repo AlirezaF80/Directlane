@@ -1,7 +1,6 @@
-# Add these snippets to your Karing Clash-compatible config.
-
-external-controller: 127.0.0.1:9093
-# secret: "your-secret"  # optional; set KARING_SECRET to match
+# Karing enables Control and Sync (external controller) automatically.
+# Default port is usually 3057 — see Settings → Port → Control and Sync.
+# proxy-learner auto-reads %APPDATA%\karing\karing\service.json for port + secret.
 
 rule-providers:
   learned-direct:
