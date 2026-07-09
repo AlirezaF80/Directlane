@@ -15,10 +15,10 @@ def test_promote_domain_after_threshold_and_successful_probe(tmp_path):
     for _ in range(3):
         learner.handle_proxied_host("www.example.com")
 
-    assert learner.rules.has_rule("DOMAIN-SUFFIX", "example.com") is True
+    assert learner.rules.has_rule("DOMAIN", "www.example.com") is True
 
 
-def test_sightings_aggregate_by_rule_target(tmp_path):
+def test_sightings_are_per_host_not_aggregated(tmp_path):
     rules_path = tmp_path / "learned-direct.json"
     state_path = tmp_path / "state.json"
     learner = Learner(
@@ -33,7 +33,7 @@ def test_sightings_aggregate_by_rule_target(tmp_path):
     learner.handle_proxied_host("api.example.com")
     learner.handle_proxied_host("cdn.example.com")
 
-    assert learner.rules.has_rule("DOMAIN-SUFFIX", "example.com") is True
+    assert learner.rules.list_domains() == []
 
 
 def test_does_not_promote_before_threshold(tmp_path, mocker):
@@ -52,7 +52,7 @@ def test_does_not_promote_before_threshold(tmp_path, mocker):
     learner.handle_proxied_host("www.example.com")
 
     probe.assert_not_called()
-    assert learner.rules.list_domain_suffixes() == []
+    assert learner.rules.list_domains() == []
 
 
 def test_failed_probe_does_not_add_rule(tmp_path):
@@ -69,7 +69,7 @@ def test_failed_probe_does_not_add_rule(tmp_path):
     learner.handle_proxied_host("www.example.com")
     learner.handle_proxied_host("www.example.com")
 
-    assert learner.rules.list_domain_suffixes() == []
+    assert learner.rules.list_domains() == []
 
 
 def test_revoke_learned_domain_on_direct_failure(tmp_path, mocker):
@@ -82,11 +82,11 @@ def test_revoke_learned_domain_on_direct_failure(tmp_path, mocker):
         probe=lambda host: True,
         on_rules_changed=lambda: None,
     )
-    learner.rules.add_rule("DOMAIN-SUFFIX", "blocked.com")
+    learner.rules.add_rule("DOMAIN", "blocked.example.com")
 
     learner.handle_direct_failure(
-        "blocked.com",
+        "blocked.example.com",
         probe=mocker.Mock(side_effect=[False, False, True]),
     )
 
-    assert learner.rules.has_rule("DOMAIN-SUFFIX", "blocked.com") is False
+    assert learner.rules.has_rule("DOMAIN", "blocked.example.com") is False

@@ -38,7 +38,7 @@ Python sidecar for [Karing](https://karing.app) that learns which domains are re
 |------|----------|
 | Observe | Polls Karing `GET /connections` for proxied traffic |
 | Count | Records sightings per rule target; probes after threshold (default 3) |
-| Promote | TLS probe 2/3 success → adds suffix to `learned-direct.json` |
+| Promote | TLS probe 2/3 success → adds exact hostname to `learned-direct.json` `domain` list |
 | Revoke | Watches warning logs; on DIRECT failure → re-probe 2/3 fail → remove suffix |
 
 Unknown domains keep Karing's default **PROXY** behavior. The learner only grows the DIRECT list.

@@ -1,33 +1,26 @@
 from proxy_learner.domain import to_rule_target
 
 
-def test_to_rule_target_strips_www_suffix():
+def test_to_rule_target_uses_exact_hostname():
     assert to_rule_target("www.digikala.com") == (
-        "DOMAIN-SUFFIX",
-        "digikala.com",
+        "DOMAIN",
+        "www.digikala.com",
     )
 
 
-def test_to_rule_target_strips_cdn_suffix():
-    assert to_rule_target("cdn.something.io") == (
-        "DOMAIN-SUFFIX",
-        "something.io",
+def test_to_rule_target_preserves_subdomain():
+    assert to_rule_target("api2.cursor.sh") == ("DOMAIN", "api2.cursor.sh")
+
+
+def test_to_rule_target_preserves_deep_subdomain():
+    assert to_rule_target("colab.research.google.com") == (
+        "DOMAIN",
+        "colab.research.google.com",
     )
 
 
-def test_to_rule_target_strips_api_suffix():
-    assert to_rule_target("api.github.com") == ("DOMAIN-SUFFIX", "github.com")
-
-
-def test_to_rule_target_two_label_domain():
-    assert to_rule_target("github.com") == ("DOMAIN-SUFFIX", "github.com")
-
-
-def test_to_rule_target_subdomain_without_known_prefix():
-    assert to_rule_target("raw.githubusercontent.com") == (
-        "DOMAIN-SUFFIX",
-        "githubusercontent.com",
-    )
+def test_to_rule_target_normalizes_case():
+    assert to_rule_target("WWW.Example.COM") == ("DOMAIN", "www.example.com")
 
 
 def test_to_rule_target_ip_uses_exact_domain():
