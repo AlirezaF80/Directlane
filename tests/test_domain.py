@@ -1,4 +1,4 @@
-from proxy_learner.domain import to_rule_line, to_rule_target
+from proxy_learner.domain import to_rule_target
 
 
 def test_to_rule_target_strips_www_suffix():
@@ -32,7 +32,3 @@ def test_to_rule_target_subdomain_without_known_prefix():
 
 def test_to_rule_target_ip_uses_exact_domain():
     assert to_rule_target("8.8.8.8") == ("DOMAIN", "8.8.8.8")
-
-
-def test_to_rule_line_formats_clash_rule():
-    assert to_rule_line("www.example.com") == "DOMAIN-SUFFIX,example.com,DIRECT"

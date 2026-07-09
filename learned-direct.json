@@ -1,0 +1,11 @@
+{
+  "rules": [
+    {
+      "outbound": "direct",
+      "name": "learned-direct",
+      "switch": true,
+      "or": true,
+      "domain_suffix": []
+    }
+  ]
+}

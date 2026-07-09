@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import ipaddress
-import re
 
 STRIP_LABELS = frozenset({"www", "cdn", "api", "static", "m", "mobile"})
 
@@ -40,15 +39,3 @@ def to_rule_target(hostname: str) -> tuple[str, str]:
     if "." not in base:
         return ("DOMAIN", host)
     return ("DOMAIN-SUFFIX", base)
-
-
-def to_rule_line(hostname: str) -> str:
-    rule_type, target = to_rule_target(hostname)
-    return f"{rule_type},{target},DIRECT"
-
-
-def rule_key(rule_line: str) -> tuple[str, str]:
-    match = re.match(r"^(DOMAIN(?:-SUFFIX|-KEYWORD)?|IP-CIDR),(.+),DIRECT$", rule_line)
-    if not match:
-        raise ValueError(f"invalid rule line: {rule_line}")
-    return match.group(1), match.group(2)

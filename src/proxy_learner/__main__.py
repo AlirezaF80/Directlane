@@ -4,8 +4,6 @@ import logging
 import time
 from threading import Event, Thread
 
-import requests
-
 from proxy_learner.config import Config
 from proxy_learner.karing import KaringClient
 from proxy_learner.learner import Learner
@@ -14,21 +12,19 @@ from proxy_learner.logs import find_failed_host
 logger = logging.getLogger(__name__)
 
 
-def build_learner(config: Config, client: KaringClient) -> Learner:
-    def reload_provider() -> None:
-        try:
-            client.reload_rule_provider(config.rule_provider_name)
-        except requests.RequestException as exc:
-            logger.warning("failed to reload rule provider: %s", exc)
+def build_learner(config: Config) -> Learner:
+    def on_rules_changed() -> None:
+        logger.info("updated Karing rules: %s", config.rules_path)
 
     return Learner(
         rules_path=config.rules_path,
         state_path=config.state_path,
         sighting_threshold=config.sighting_threshold,
-        reload_provider=reload_provider,
+        on_rules_changed=on_rules_changed,
         probe_attempts=config.probe_attempts,
         probe_required_successes=config.probe_required_successes,
         probe_timeout_seconds=config.probe_timeout_seconds,
+        group_name=config.group_name,
     )
 
 
@@ -41,11 +37,7 @@ def poll_connections(learner: Learner, client: KaringClient) -> None:
     learner.process_connections(connections)
 
 
-def watch_logs(
-    learner: Learner,
-    client: KaringClient,
-    stop_event: Event,
-) -> None:
+def watch_logs(learner: Learner, client: KaringClient, stop_event: Event) -> None:
     while not stop_event.is_set():
         try:
             response = client.iter_log_lines(level="warning")
@@ -54,7 +46,7 @@ def watch_logs(
                     break
                 if not raw_line:
                     continue
-                host = find_failed_host(raw_line, learner.rules.list_rules())
+                host = find_failed_host(raw_line, learner.rules.list_targets())
                 if host:
                     learner.handle_direct_failure(host)
         except Exception as exc:
@@ -71,8 +63,9 @@ def run(config: Config | None = None) -> None:
         "Auth: %s",
         "secret configured" if config.karing_secret else "no secret",
     )
+    logger.info("Rules file: %s", config.rules_path)
     client = KaringClient(config.karing_api_url, config.karing_secret)
-    learner = build_learner(config, client)
+    learner = build_learner(config)
     stop_event = Event()
 
     log_thread = Thread(

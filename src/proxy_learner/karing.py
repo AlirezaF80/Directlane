@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 import requests
 
 from proxy_learner.domain import normalize_host
-
-logger = logging.getLogger(__name__)
 
 
 class KaringClient:
@@ -37,11 +34,6 @@ class KaringClient:
             timeout=10,
         )
         if response.status_code == 404:
-            logger.warning(
-                "rule provider %r not found in Karing — add it via "
-                "config/karing-snippet.yaml and reconnect",
-                provider_name,
-            )
             return False
         response.raise_for_status()
         return True

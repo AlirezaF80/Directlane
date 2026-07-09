@@ -1,6 +1,0 @@
-payload:
-- DOMAIN-SUFFIX,cursor.sh,DIRECT
-- DOMAIN-SUFFIX,google.com,DIRECT
-- DOMAIN-SUFFIX,googlevideo.com,DIRECT
-- DOMAIN-SUFFIX,googleapis.com,DIRECT
-- DOMAIN-SUFFIX,ytimg.com,DIRECT

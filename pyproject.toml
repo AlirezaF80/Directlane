@@ -4,12 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "proxy-learner"
-version = "0.1.0"
+version = "0.2.0"
 description = "Karing sidecar that learns which domains work via direct connection"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "PyYAML>=6.0",
     "requests>=2.31",
 ]
 

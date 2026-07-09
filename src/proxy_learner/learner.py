@@ -3,9 +3,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from pathlib import Path
 
-from proxy_learner.domain import to_rule_line, to_rule_target
+from proxy_learner.domain import to_rule_target
 from proxy_learner.probe import confirm_outcome
-from proxy_learner.rules import RuleStore
+from proxy_learner.rules import KaringRuleStore
 from proxy_learner.state import LearnerState
 
 
@@ -16,15 +16,16 @@ class Learner:
         state_path: str | Path,
         sighting_threshold: int = 3,
         probe: Callable[[str], bool] | None = None,
-        reload_provider: Callable[[], None] | None = None,
+        on_rules_changed: Callable[[], None] | None = None,
         probe_attempts: int = 3,
         probe_required_successes: int = 2,
         probe_timeout_seconds: float = 5.0,
+        group_name: str = "learned-direct",
     ) -> None:
-        self.rules = RuleStore(rules_path)
+        self.rules = KaringRuleStore(rules_path, group_name=group_name)
         self.state = LearnerState(state_path, sighting_threshold=sighting_threshold)
         self._probe = probe
-        self._reload_provider = reload_provider
+        self._on_rules_changed = on_rules_changed
         self._probe_attempts = probe_attempts
         self._probe_required_successes = probe_required_successes
         self._probe_timeout_seconds = probe_timeout_seconds
@@ -44,10 +45,10 @@ class Learner:
             self.state.mark_probed(target)
             return False
 
-        added = self.rules.add_rule(to_rule_line(host))
+        added = self.rules.add_rule(rule_type, target)
         self.state.mark_probed(target)
-        if added and self._reload_provider is not None:
-            self._reload_provider()
+        if added and self._on_rules_changed is not None:
+            self._on_rules_changed()
         return added
 
     def handle_direct_failure(
@@ -57,16 +58,15 @@ class Learner:
     ) -> bool:
         host = host.lower()
         rule_type, target = to_rule_target(host)
-        rule_line = f"{rule_type},{target},DIRECT"
-        if rule_line not in self.rules.list_rules():
+        if not self.rules.has_rule(rule_type, target):
             return False
 
         if not self._confirm_direct_failure(host, probe=probe):
             return False
 
-        removed = self.rules.remove_rule(rule_line)
-        if removed and self._reload_provider is not None:
-            self._reload_provider()
+        removed = self.rules.remove_rule(rule_type, target)
+        if removed and self._on_rules_changed is not None:
+            self._on_rules_changed()
         return removed
 
     def process_connections(self, connections: list[dict]) -> None:

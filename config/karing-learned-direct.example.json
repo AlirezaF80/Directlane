@@ -1,0 +1,16 @@
+# Karing diversion import format (see Desktop diversion_rules_custom.json).
+# proxy-learner writes learned-direct-karing.json automatically.
+# Import in Karing: Diversion Rules → import JSON, or merge the group below
+# into your full rules file BEFORE the final proxy catch-all.
+
+{
+  "rules": [
+    {
+      "outbound": "direct",
+      "name": "learned-direct",
+      "switch": true,
+      "or": true,
+      "domain_suffix": []
+    }
+  ]
+}

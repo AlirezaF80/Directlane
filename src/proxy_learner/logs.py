@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import re
 
-from proxy_learner.domain import rule_key
-
 FAILURE_KEYWORDS = (
     "timeout",
     "refused",
@@ -14,22 +12,14 @@ FAILURE_KEYWORDS = (
 )
 
 
-def learned_targets(rule_lines: list[str]) -> set[str]:
-    targets: set[str] = set()
-    for line in rule_lines:
-        _, target = rule_key(line)
-        targets.add(target.lower())
-    return targets
-
-
-def find_failed_host(log_line: str, rule_lines: list[str]) -> str | None:
+def find_failed_host(log_line: str, targets: set[str]) -> str | None:
     lower = log_line.lower()
     if "direct" not in lower:
         return None
     if not any(keyword in lower for keyword in FAILURE_KEYWORDS):
         return None
 
-    for target in learned_targets(rule_lines):
+    for target in targets:
         if target in lower:
             return target
 
@@ -39,6 +29,6 @@ def find_failed_host(log_line: str, rule_lines: list[str]) -> str | None:
     )
     if host_match:
         candidate = host_match.group(1)
-        if candidate in learned_targets(rule_lines):
+        if candidate in targets:
             return candidate
     return None

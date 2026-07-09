@@ -12,7 +12,7 @@ class Config:
     karing_secret: str | None
     rules_path: str
     state_path: str
-    rule_provider_name: str
+    group_name: str
     sighting_threshold: int
     poll_interval_seconds: float
     probe_attempts: int
@@ -30,11 +30,9 @@ class Config:
                 "KARING_API_URL", default_api_url
             ).rstrip("/"),
             karing_secret=os.environ.get("KARING_SECRET", default_secret) or None,
-            rules_path=os.environ.get("RULES_PATH", "learned-direct.yaml"),
+            rules_path=os.environ.get("RULES_PATH", "learned-direct.json"),
             state_path=os.environ.get("STATE_PATH", "state.json"),
-            rule_provider_name=os.environ.get(
-                "RULE_PROVIDER_NAME", "learned-direct"
-            ),
+            group_name=os.environ.get("KARING_GROUP_NAME", "learned-direct"),
             sighting_threshold=int(os.environ.get("SIGHTING_THRESHOLD", "3")),
             poll_interval_seconds=float(
                 os.environ.get("POLL_INTERVAL_SECONDS", "5")
