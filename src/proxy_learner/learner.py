@@ -6,7 +6,7 @@ from pathlib import Path
 from proxy_learner.domain import to_rule_target
 from proxy_learner.probe import confirm_outcome
 from proxy_learner.rules import KaringRuleStore
-from proxy_learner.state import LearnerState
+from proxy_learner.state import ProbeState
 
 
 class Learner:
@@ -14,7 +14,6 @@ class Learner:
         self,
         rules_path: str | Path,
         state_path: str | Path,
-        sighting_threshold: int = 3,
         probe: Callable[[str], bool] | None = None,
         on_rules_changed: Callable[[], None] | None = None,
         probe_attempts: int = 3,
@@ -23,7 +22,7 @@ class Learner:
         group_name: str = "learned-direct",
     ) -> None:
         self.rules = KaringRuleStore(rules_path, group_name=group_name)
-        self.state = LearnerState(state_path, sighting_threshold=sighting_threshold)
+        self.state = ProbeState(state_path)
         self._probe = probe
         self._on_rules_changed = on_rules_changed
         self._probe_attempts = probe_attempts
@@ -33,19 +32,17 @@ class Learner:
 
     def handle_proxied_host(self, host: str) -> bool:
         host = host.lower()
-        rule_type, target = to_rule_target(host)
-        if self.rules.has_rule(rule_type, target):
+        _, target = to_rule_target(host)
+        if self.rules.has_rule(target):
             return False
-
-        self.state.record_sighting(target)
-        if not self.state.is_ready_for_probe(target):
+        if self.state.was_probed(target):
             return False
 
         if not self._run_probe(host):
             self.state.mark_probed(target)
             return False
 
-        added = self.rules.add_rule(rule_type, target)
+        added = self.rules.add_rule(target)
         self.state.mark_probed(target)
         if added and self._on_rules_changed is not None:
             self._on_rules_changed()
@@ -57,16 +54,18 @@ class Learner:
         probe: Callable[[str], bool] | None = None,
     ) -> bool:
         host = host.lower()
-        rule_type, target = to_rule_target(host)
-        if not self.rules.has_rule(rule_type, target):
+        _, target = to_rule_target(host)
+        if not self.rules.has_rule(target):
             return False
 
         if not self._confirm_direct_failure(host, probe=probe):
             return False
 
-        removed = self.rules.remove_rule(rule_type, target)
-        if removed and self._on_rules_changed is not None:
-            self._on_rules_changed()
+        removed = self.rules.remove_rule(target)
+        if removed:
+            self.state.clear(target)
+            if self._on_rules_changed is not None:
+                self._on_rules_changed()
         return removed
 
     def process_connections(self, connections: list[dict]) -> None:

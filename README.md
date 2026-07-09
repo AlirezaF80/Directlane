@@ -37,9 +37,9 @@ Python sidecar for [Karing](https://karing.app) that learns which domains are re
 | Step | Behavior |
 |------|----------|
 | Observe | Polls Karing `GET /connections` for proxied traffic |
-| Count | Records sightings per rule target; probes after threshold (default 3) |
-| Promote | TLS probe 2/3 success → adds exact hostname to `learned-direct.json` `domain` list |
-| Revoke | Watches warning logs; on DIRECT failure → re-probe 2/3 fail → remove suffix |
+| Probe | TLS probe 2/3 on first unseen hostname |
+| Promote | Adds exact hostname to `learned-direct.json` `domain` list |
+| Revoke | Watches warning logs; on DIRECT failure → re-probe 2/3 fail → remove host |
 
 Unknown domains keep Karing's default **PROXY** behavior. The learner only grows the DIRECT list.
 
@@ -51,8 +51,7 @@ Unknown domains keep Karing's default **PROXY** behavior. The learner only grows
 | `KARING_SECRET` | auto from `service.json` | Bearer token |
 | `RULES_PATH` | `learned-direct.json` | Karing diversion import file |
 | `KARING_GROUP_NAME` | `learned-direct` | Diversion group name in JSON |
-| `STATE_PATH` | `state.json` | Sighting counts |
-| `SIGHTING_THRESHOLD` | `3` | Sightings before probe |
+| `STATE_PATH` | `state.json` | Hosts already probed |
 | `POLL_INTERVAL_SECONDS` | `5` | Connection poll interval |
 | `PROBE_ATTEMPTS` | `3` | Probes per decision |
 | `PROBE_REQUIRED_SUCCESSES` | `2` | Required matching outcomes |

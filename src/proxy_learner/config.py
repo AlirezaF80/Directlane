@@ -13,7 +13,6 @@ class Config:
     rules_path: str
     state_path: str
     group_name: str
-    sighting_threshold: int
     poll_interval_seconds: float
     probe_attempts: int
     probe_required_successes: int
@@ -33,7 +32,6 @@ class Config:
             rules_path=os.environ.get("RULES_PATH", "learned-direct.json"),
             state_path=os.environ.get("STATE_PATH", "state.json"),
             group_name=os.environ.get("KARING_GROUP_NAME", "learned-direct"),
-            sighting_threshold=int(os.environ.get("SIGHTING_THRESHOLD", "3")),
             poll_interval_seconds=float(
                 os.environ.get("POLL_INTERVAL_SECONDS", "5")
             ),

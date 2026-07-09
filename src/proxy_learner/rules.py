@@ -18,62 +18,33 @@ class KaringRuleStore:
     def path(self) -> Path:
         return self._path
 
-    def list_domain_suffixes(self) -> list[str]:
-        return list(self._load_group().get("domain_suffix", []))
-
     def list_domains(self) -> list[str]:
         return list(self._load_group().get("domain", []))
 
     def list_targets(self) -> set[str]:
-        targets = {suffix.lstrip(".").lower() for suffix in self.list_domain_suffixes()}
-        targets.update(domain.lower() for domain in self.list_domains())
-        return targets
+        return {domain.lower() for domain in self.list_domains()}
 
-    def has_rule(self, rule_type: str, target: str) -> bool:
-        target = target.lower()
-        if rule_type == "DOMAIN-SUFFIX":
-            return f".{target}" in [s.lower() for s in self.list_domain_suffixes()]
-        if rule_type == "DOMAIN":
-            return target in [d.lower() for d in self.list_domains()]
-        return False
+    def has_rule(self, target: str) -> bool:
+        return target.lower() in self.list_targets()
 
-    def add_rule(self, rule_type: str, target: str) -> bool:
+    def add_rule(self, target: str) -> bool:
         group = self._load_group()
-        if rule_type == "DOMAIN-SUFFIX":
-            suffix = f".{target.lower().lstrip('.')}"
-            suffixes = group.setdefault("domain_suffix", [])
-            if suffix in suffixes:
-                return False
-            suffixes.append(suffix)
-            suffixes.sort()
-        elif rule_type == "DOMAIN":
-            domain = target.lower()
-            domains = group.setdefault("domain", [])
-            if domain in domains:
-                return False
-            domains.append(domain)
-            domains.sort()
-        else:
-            raise ValueError(f"unsupported rule type: {rule_type}")
+        domain = target.lower()
+        domains = group.setdefault("domain", [])
+        if domain in domains:
+            return False
+        domains.append(domain)
+        domains.sort()
         self._write_group(group)
         return True
 
-    def remove_rule(self, rule_type: str, target: str) -> bool:
+    def remove_rule(self, target: str) -> bool:
         group = self._load_group()
-        if rule_type == "DOMAIN-SUFFIX":
-            suffix = f".{target.lower().lstrip('.')}"
-            suffixes = group.get("domain_suffix", [])
-            if suffix not in suffixes:
-                return False
-            suffixes.remove(suffix)
-        elif rule_type == "DOMAIN":
-            domain = target.lower()
-            domains = group.get("domain", [])
-            if domain not in domains:
-                return False
-            domains.remove(domain)
-        else:
-            raise ValueError(f"unsupported rule type: {rule_type}")
+        domain = target.lower()
+        domains = group.get("domain", [])
+        if domain not in domains:
+            return False
+        domains.remove(domain)
         self._write_group(group)
         return True
 
@@ -92,9 +63,12 @@ class KaringRuleStore:
         rules = data.get("rules", [])
         if not rules:
             return self._empty_group()
-        return dict(rules[0])
+        group = dict(rules[0])
+        group.pop("domain_suffix", None)
+        return group
 
     def _write_group(self, group: dict) -> None:
+        group.pop("domain_suffix", None)
         self._path.parent.mkdir(parents=True, exist_ok=True)
         document = {"rules": [group]}
         self._path.write_text(

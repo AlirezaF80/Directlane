@@ -19,7 +19,6 @@ def build_learner(config: Config) -> Learner:
     return Learner(
         rules_path=config.rules_path,
         state_path=config.state_path,
-        sighting_threshold=config.sighting_threshold,
         on_rules_changed=on_rules_changed,
         probe_attempts=config.probe_attempts,
         probe_required_successes=config.probe_required_successes,

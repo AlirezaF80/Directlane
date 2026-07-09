@@ -5,28 +5,9 @@
       "name": "learned-direct",
       "switch": true,
       "or": true,
+      "domain": [],
       "domain_suffix": [
-        ".awswaf.com",
-        ".boostgroove.com",
-        ".chatgpt.com",
-        ".cursor.sh",
-        ".datatables.net",
-        ".extensionpay.com",
-        ".github.com",
-        ".google-analytics.com",
-        ".google.com",
-        ".googleapis.com",
-        ".googleusercontent.com",
-        ".gstatic.com",
-        ".gvt1.com",
-        ".huggingface.co",
-        ".iranlms.ir",
-        ".magsrv.com",
-        ".r34comix.com",
-        ".rubika.ir",
-        ".stripe.com",
-        ".trafficdeposit.com",
-        ".withgoogle.com"
+        ".cursor.sh"
       ]
     }
   ]

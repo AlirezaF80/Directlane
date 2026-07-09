@@ -1,42 +1,30 @@
-from proxy_learner.state import LearnerState
+from proxy_learner.state import ProbeState
 
 
-def test_record_sighting_increments_count(tmp_path):
+def test_mark_probed_records_host(tmp_path):
     state_path = tmp_path / "state.json"
-    state = LearnerState(state_path)
-
-    assert state.record_sighting("example.com") == 1
-    assert state.record_sighting("example.com") == 2
-
-
-def test_is_ready_for_probe_after_threshold(tmp_path):
-    state_path = tmp_path / "state.json"
-    state = LearnerState(state_path, sighting_threshold=3)
-
-    state.record_sighting("example.com")
-    state.record_sighting("example.com")
-    assert state.is_ready_for_probe("example.com") is False
-
-    state.record_sighting("example.com")
-    assert state.is_ready_for_probe("example.com") is True
-
-
-def test_mark_probed_clears_sighting_count(tmp_path):
-    state_path = tmp_path / "state.json"
-    state = LearnerState(state_path, sighting_threshold=2)
-    state.record_sighting("example.com")
-    state.record_sighting("example.com")
+    state = ProbeState(state_path)
 
     state.mark_probed("example.com")
-    assert state.is_ready_for_probe("example.com") is False
-    assert state.get_sighting_count("example.com") == 0
+
+    assert state.was_probed("example.com") is True
+    assert state.was_probed("other.com") is False
+
+
+def test_clear_allows_reprobe(tmp_path):
+    state_path = tmp_path / "state.json"
+    state = ProbeState(state_path)
+    state.mark_probed("example.com")
+
+    state.clear("example.com")
+
+    assert state.was_probed("example.com") is False
 
 
 def test_persistence_across_instances(tmp_path):
     state_path = tmp_path / "state.json"
-    state = LearnerState(state_path, sighting_threshold=3)
-    state.record_sighting("example.com")
-    state.record_sighting("example.com")
+    state = ProbeState(state_path)
+    state.mark_probed("example.com")
 
-    reloaded = LearnerState(state_path, sighting_threshold=3)
-    assert reloaded.get_sighting_count("example.com") == 2
+    reloaded = ProbeState(state_path)
+    assert reloaded.was_probed("example.com") is True
